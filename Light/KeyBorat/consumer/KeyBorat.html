@@ -1,0 +1,36 @@
+<html>
+	 <head>
+	  <link rel="stylesheet" href="KeyBorat.css">
+	 </head>
+
+    <body>
+
+		<div class="container">
+		  <div class="fixed">
+
+			  <div class="flex-item">
+					<p>
+						<button class="button" id="obutton" type="button">Decode B64</button>
+						<button class="button" id="spbutton" type="button">Save Plain (Txt)</button>
+						<button class="button" id="sebutton" type="button">Save Encoded (B64)</button>
+						<button class="button" id="sbbutton" type="button">Save Decoded (Bin)</button>
+					</p>
+                    <hr/>
+					<p>
+						<button class="button" id="cebutton" type="button">Clear Displayed Encoded Contents</button>
+						<button class="button" id="cpbutton" type="button">Clear Displayed Plain Contents</button>
+					</p>
+			  </div>
+			  <div class="flex-item">
+					<p>
+						<textarea id="incoming" placeholder="Placeholder for B64 Encoded binary data"></textarea>
+					</p>
+					<p>
+						<textarea id="original" placeholder="Placeholder for Plain-text data" ></textarea>
+					</p>
+			  </div>
+
+			</div>
+		 </body>
+		 <script src='KeyBorat.js'></script>
+	</html>

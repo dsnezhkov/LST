@@ -1,0 +1,169 @@
+<html>
+<head>
+    <style>
+    input[type="file"] {
+        display: none;
+    }
+    .custom-file-upload {
+        border: 1px solid #ccc;
+        display: inline-block;
+        padding: 10px;
+        margin-left: 60px;
+        margin-bottom: 10px;
+        background: ivory;
+        cursor: hand;
+    }
+    </style>
+    <script src="./webaudio_tools.js"></script>
+
+</head>
+<body>
+
+<h1>Pulse on Pitch </h1>
+
+<label for="file-upload" class="custom-file-upload">
+    <input id="file-upload" type='file' accept='text/plain' onchange='openFile(event)'><br>
+    <span id="message">Select File</span>
+</label>
+
+<h3> Producer Controls </h3>
+<label for="controlStartPitch">
+    Control Start Pitch
+    <input id="controlStartPitch" type ="range" min ="140" max="160" step ="5" value ="150"
+           oninput="outputUpdate(value, '#outControlStartPitch' )">
+    <output for="controlStartPitch" id="outControlStartPitch">150</output>
+</label>
+
+<br/>
+<label for="controlStopPitch">
+    Control Stop Pitch
+    <input id="controlStopPitch" type ="range" min ="5000" max="5050" step ="10" value ="5000"
+           oninput="outputUpdate(value, '#outControlStopPitch' )">
+    <output for="controlStopPitch" id="outControlStopPitch">5000</output>
+</label>
+
+<br/>
+<label for="startPitchLow">
+    Start @ Pitch
+    <input id="startPitchLow" type ="range" min ="160" max="220" step ="10" value ="180"
+           oninput="outputUpdate(value, '#outStartPitchLow' )">
+    <output for="startPitchLow" id="outStartPitchLow">180</output>
+</label>
+
+<br/>
+<label for="startPitchGap">
+    Pitch Gap
+    <input id="startPitchGap" type ="range" min ="30" max="50" step ="2" value ="40"
+           oninput="outputUpdate(value, '#outStartPitchGap' )">
+    <output for="startPitchGap" id="outStartPitchGap">40</output>
+</label>
+
+<script>
+
+    function outputUpdate(value, selector) {
+        document.querySelector(selector).value = value;
+    }
+</script>
+<script>
+
+    var totalPitches = 65;
+    var controlPitchDuration=0.1;
+    var dataPitchDuration=0.3; // tone sounds for ..
+    var dataPitchInterval = 600; // pause between tones for ..
+    var controlStartPitch = parseInt(document.getElementById("outControlStartPitch").value);
+    var controlStopPitch = parseInt(document.getElementById("outControlStopPitch").value);
+    var startPitchLow = parseInt(document.getElementById("outStartPitchLow").value);
+    var startPitchGap = parseInt(document.getElementById("outStartPitchGap").value);
+    var message =  document.getElementById("message");
+    var oscillator;
+
+    var openFile = function (event, elem) {
+        var input = event.target;
+        var reader = new FileReader();
+        var data;
+        reader.onload = function () {
+            var data = reader.result;
+            // Remove data type markers, we send as bytes
+            data = data.replace(/data:.*;base64,/, '');
+            initAudio(data);
+        };
+        reader.readAsDataURL(input.files[0]); // > encodes to Base64
+        message.textContent="Beaming ... " ;
+    };
+
+
+    function doTone(freq, control) {
+        oscillator = audioContext.createOscillator();
+        oscillator.frequency.value = freq;
+        fixOscillator(oscillator);
+        oscillator.connect(audioContext.destination);
+        oscillator.start(0);
+
+        if (control) {
+            oscillator.stop(audioContext.currentTime + controlPitchDuration);
+        } else {
+            oscillator.stop(audioContext.currentTime + dataPitchDuration); // 0.3 : 600
+        }
+    }
+
+    function initAudio(data) {
+
+        // Use audioContext from webaudio_tools.js
+        if (audioContext) {
+
+            // Generate list of frequencies from parameters
+            var freqs = new Array(totalPitches-1);
+            var current = startPitchLow;
+            for ( var count = 0;count < totalPitches; count++ ){
+                freqs[count] = current;
+                current += startPitchGap;
+            }
+            var charset = [
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+                'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+                'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd',
+                'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x',
+                'y', 'z', '0', '1', '2', '3', '4', '5', '6', '7',
+                '8', '9', '+', '/', '='
+            ];
+
+            // Map charset to frequencies
+            var tone = {}, c;
+            for (c = 0; c < charset.length; c++) {
+                tone[charset[c]] = freqs[c];
+            }
+
+            /* var upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            var lower = 'abcdefghijklmnopqrstuvwxyz';
+            var numeric = '0123456789';
+            var control = '+/=';
+            var data=upper+lower+numeric+control; */
+            // console.log(data);
+
+            console.log("Beaming started");
+            console.log("Control START Pitch");
+            doTone(controlStartPitch, true);
+
+            var i = 0;
+            var osinterval = setInterval(function () {
+                if (i == data.length) {
+                    i = 0;
+                    clearInterval(osinterval);
+                    console.log("Control STOP Pitch");
+                    doTone(controlStopPitch, true);
+                    console.log("Beaming complete");
+                    message.textContent="Complete" ;
+
+                } else {
+                    console.log(data.charAt(i) + ":" + tone[data.charAt(i)]);
+                    doTone(tone[data.charAt(i)], false);
+                }
+                i++;
+            }, dataPitchInterval);
+        }
+    }
+</script>
+
+</body>
+</html>

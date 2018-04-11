@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .output {
+            width: 300px;
+            height: 300px;
+            background: #cccccc;
+            margin-left: 50px;
+            margin-top: 50px;
+            padding-left: 50px;
+            padding-top: 50px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            display: inline-block;
+            cursor: hand;
+        }
+    </style>
+</head>
+<body>
+<h3>Pulse on QR codes </h3>
+<div id="message"> Waiting for a file. Click on QR to load when instructed.</div>
+<label for="file-upload" class="custom-file-upload">
+    <input id="file-upload" type='file' accept='text/plain'><br>
+    <div id="output" class="output"></div>
+</label>
+
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.14.0/jquery-qrcode.min.js"
+        integrity="sha256-/c2BJnPitwd2VUgSwpjp1dg+6hdyJ0haWSY6ddU9hqY="
+        crossorigin="anonymous"></script>
+<script>
+    $(function(){
+
+
+        $(document).on('change', "#file-upload", function() {
+            openFile(event);
+        });
+
+        var genQRCode = function (chunk, color){
+            // console.log("Beamed: " + chunk + " <-> " + window.atob(chunk) );
+            // console.log("Beamed: " + chunk );
+            // chunk = chunk.replace(/=/g , '_');
+            document.getElementById('output').innerHTML = "";
+
+            // https://larsjung.de/jquery-qrcode/
+            $('#output').qrcode(
+                        {
+                            render: 'div',
+                            ecLevel: 'L',
+                            text: chunk,
+                            fill: color,
+                            size: 250,
+                            mode: 0,
+                            minVersion: 21,  // http://www.qrcode.com/en/about/version.html
+                            maxVersion: 30,
+                            quiet: 5,
+                            background: "white"
+                        });
+        };
+
+        var showContents = function (target, data,  dinterval){
+
+            let chunks = data.match(/.{1,64}/g);
+            let curChunkIndex = -1;
+
+            var qrGenInterval = setInterval(function() {
+                ++curChunkIndex;
+                if (curChunkIndex >= chunks.length) {
+                    curChunkIndex = 0;
+                    clearInterval(qrGenInterval);
+                    genQRCode("stop", "black");
+                }else{
+                    genQRCode(chunks[curChunkIndex], "green");
+                }
+            }, dinterval);
+
+        };
+
+        var openFile = function(event) {
+            var input = event.target;
+            var workdelay = 5000;
+            var dinterval = 600;
+            var node = '#output';
+            var reader = new FileReader();
+            reader.onload = function(){
+                var data = reader.result;
+                data = data.replace(/data:.*;base64,/, '');
+                // Base64 encode data
+                // var bdata = window.btoa(unescape(encodeURIComponent(data)));
+                $('#message').text(
+                        "Beaming will start in " + workdelay/1000 + " seconds"
+                        + " at the rate of " + dinterval + "ms"
+                );
+                setTimeout(function () {
+                    // showContents(node, bdata, dinterval);
+                    showContents(node, data, dinterval);
+                }, workdelay);
+
+            };
+            // reader.readAsText(input.files[0]);
+            // reader.readAsBinaryString(input.files[0]);
+            reader.readAsDataURL(input.files[0]); // > encodes to BAse64
+        };
+
+        console.log("Beamed start");
+        $('#output').qrcode(
+                {
+                    render: 'div',
+                    ecLevel: 'L',
+                    text: "start",
+                    fill: "green",
+                    size: 250,
+                    mode: 0,
+                    minVersion: 21,
+                    maxVersion: 30,
+                    quiet: 5,
+                    background: "white"
+                });
+    });
+</script>
+
+</body>
+</html>

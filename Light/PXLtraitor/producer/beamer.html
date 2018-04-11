@@ -1,0 +1,124 @@
+<html>
+<head>
+    <style>
+        .guideBox {
+            width: 250px;
+            height: 30px;
+            margin: 10px;
+            border: 1px solid green;
+        }
+        .sGuide { width: 60px; height: 20px; border: 0px; background: #ff0000; margin: 5px; display: inline-block; padding-left: 10px; }
+        .eGuide { width: 60px; height: 20px; border: 0px; background: #00ff00; margin: 5px; display: inline-block; padding-left: 10px; }
+        .fGuide { width: 60px; height: 20px; border: 0px; background: #ff00ff; margin: 5px; display: inline-block; padding-left: 10px;}
+        .square {
+            width: 50px;
+            height: 50px;
+            border: 0px;
+            background: #000000;
+            margin: 10px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+            padding: 10px;
+            margin: 50px;
+            background: ivory;
+            cursor: hand;
+        }
+    </style>
+</head>
+<body>
+<h3> Pulse on Blue spectrum, with fencing... </h3>
+<div class="guideBox">
+    <div class="sGuide">Start</div>
+    <div class="eGuide">Stop</div>
+    <div class="fGuide">Fence</div>
+</div>
+<label for="file-upload" class="custom-file-upload">
+    <input id="file-upload" type='file' accept='text/plain' onchange='openFile(event)'><br>
+    <div id="output"></div>
+</label>
+<script>
+
+    var dinterval = 100; // how often to blink bytes
+    var fencewait = 50;  // fence blink duration
+    var workdelay = 5000; // 5 sec lead time to get mouse in position or prepare serverside capture
+
+    var fenceHex = "#ff00ff";
+    var stopHex  = "#00ff00";
+    var startHex = "#ff0000";
+
+    var node = document.getElementById('output');
+    node.className = 'square';
+
+    var showContents = function (target, data, dinterval, fencewait){
+
+        let arr = data;
+        let genObj = genFunc();
+
+        let interval = setInterval(() => {
+            val = genObj.next();
+
+            if (val.done) {
+
+                clearInterval(interval);
+                showStopControl(target);
+
+            } else {
+
+                var hhex = ("#0000" + val.value.charCodeAt(0).toString(16)).substr(-7);
+
+                //target.innerText = hhex;
+                target.style.background = hhex;
+
+                console.log(val.value + " - " + hhex);
+                setTimeout(function () {
+                    showFence(target);
+                }, fencewait);
+            }
+        }, dinterval);
+
+        function* genFunc() {
+            for(let item of arr) {
+                yield item;
+            }
+        }
+    };
+
+
+    var showFence = function (target) {
+        target.style.background = fenceHex;
+        // console.log("Fence  #ff00ff");
+    };
+    var showStopControl = function (target) {
+        target.style.background = stopHex;
+        // console.log("Stop  #00ff00");
+    };
+    var showStartControl = function (target) {
+        target.style.background = startHex;
+        // console.log("Start  #ff0000");
+    };
+
+    var openFile = function(event) {
+        var input = event.target;
+
+        var reader = new FileReader();
+        reader.onload = function(){
+            var data = reader.result;
+
+            // Base64 encode data
+            var bdata = window.btoa(unescape(encodeURIComponent(data)));
+            showStartControl(node);
+            setTimeout(function () {
+                showContents(node, bdata, dinterval, fencewait);
+            }, workdelay);
+
+        };
+        reader.readAsText(input.files[0]);
+    };
+</script>
+</body>
+</html>

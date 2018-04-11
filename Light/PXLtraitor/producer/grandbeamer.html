@@ -1,0 +1,141 @@
+<html>
+<head>
+    <style>
+        .square {
+            width: 50px;
+            height: 50px;
+            border: 0px;
+            background: #000000;
+            margin: 10px;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 1px solid #ccc;
+            display: inline-block;
+				padding: 10px;
+				margin: 50px;
+            background: ivory;
+            cursor: hand;
+        }
+    </style>
+</head>
+<body>
+<h3> Pulse on Full spectrum, with fencing... </h3>
+<label for="file-upload" class="custom-file-upload">
+    <input id="file-upload" type='file' accept='text/plain' onchange='openFile(event)'><br>
+    <div id="output"></div>
+</label>
+<script>
+
+    var dinterval = 100; // how often to blink bytes
+    var fencewait = 50;  // fence blink duration
+    var workdelay = 5000; // 5 sec lead time to get mouse in position or prepare serverside capture
+
+    var fenceHex = "#000000";
+    var stopHex  = "#ffffff";
+    var startHex = "#ffffff";
+
+    var node = document.getElementById('output');
+    node.className = 'square';
+
+
+    function createB64Colors(charset, ccodes) {
+        var arr = {};
+        for(var i = 0, ii = charset.length; i<ii; i++) {
+            arr[charset[i]] = ccodes[i];
+        }
+        return arr;
+    }
+
+    var charset = [
+        'A','B','C','D','E','F','G','H','I','J',
+        'K','L','M','N','O','P','Q','R','S','T',
+        'U','V','W','X','Y','Z','a','b','c','d',
+        'e','f','g','h','i','j','k','l','m','n',
+        'o','p','q','r','s','t','u','v','w','x',
+        'y','z','0','1','2','3','4','5','6','7',
+        '8','9','+','/','='
+    ];
+
+    var ccodes = [
+        '0000ff', '00ff00', '00ffff', 'ff0000', 'ff00ff', 'ffff00',          '0000aa', '00ffaa', '00aa00',
+        '00aaff', '00aaaa', 'ff00aa', 'ffffaa', 'ffaa00', 'ffaaff', 'ffaaaa', 'aa0000', 'aa00ff', 'aa00aa',
+        'aaff00', 'aaffff', 'aaffaa', 'aaaa00', 'aaaaff', 'aaaaaa', '000055', '00ff55', '00aa55', '005500',
+        '0055ff', '0055aa', '005555', 'ff0055', 'ffff55', 'ffaa55', 'ff5500', 'ff55ff', 'ff55aa', 'ff5555',
+        'aa0055', 'aaff55', 'aaaa55', 'aa5500', 'aa55ff', 'aa55aa', 'aa5555', '550000', '5500ff', '5500aa',
+        '550055', '55ff00', '55ffff', '55ffaa', '55ff55', '55aa00', '55aaff', '55aaaa', '55aa55', '555500',
+        '5555ff', '5555aa', '555555', '666666', '777777', '999999'
+    ];
+    var b64colors = createB64Colors(charset, ccodes);
+
+
+    var showContents = function (target, data, dinterval, fencewait){
+
+        let arr = data;
+        let genObj = genFunc();
+
+        let interval = setInterval(() => {
+            val = genObj.next();
+
+            if (val.done) {
+
+                clearInterval(interval);
+                showStopControl(target);
+
+            } else {
+
+                var hhex = ("#" + b64colors[val.value] );
+
+                //target.innerText = hhex;
+                target.style.background = hhex;
+
+                console.log(val.value + " - " + hhex);
+                setTimeout(function () {
+                    showFence(target);
+                }, fencewait);
+            }
+        }, dinterval);
+
+        function* genFunc() {
+            for(let item of arr) {
+                yield item;
+            }
+        }
+    };
+
+
+    var showFence = function (target) {
+        target.style.background = fenceHex;
+        console.log("Fence  " + fenceHex );
+    };
+    var showStopControl = function (target) {
+        target.style.background = stopHex;
+        console.log("Stop  " + stopHex);
+    };
+    var showStartControl = function (target) {
+        target.style.background = startHex;
+        console.log("Start  " + startHex);
+    };
+
+    var openFile = function(event) {
+        var input = event.target;
+
+        var reader = new FileReader();
+        reader.onload = function(){
+            var data = reader.result;
+
+            // Base64 encode data
+            var bdata = window.btoa(unescape(encodeURIComponent(data)));
+            showStartControl(node);
+            setTimeout(function () {
+                showContents(node, bdata, dinterval, fencewait);
+            }, workdelay);
+
+        };
+        reader.readAsText(input.files[0]);
+    };
+</script>
+</body>
+</html>
