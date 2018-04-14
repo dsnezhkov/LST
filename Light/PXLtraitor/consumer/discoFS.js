@@ -284,7 +284,6 @@ switch(options.method) {
         }
         break;
     default:
-  default:
         var usage = `
 
  USAGE Examples:
