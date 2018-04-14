@@ -3,13 +3,12 @@
 <head>
     <style>
         .output {
-            width: 300px;
-            height: 300px;
+            width: 250px;
+            height: 250px;
             background: #cccccc;
-            margin-left: 50px;
-            margin-top: 50px;
-            padding-left: 50px;
-            padding-top: 50px;
+            border: 1px solid black;
+            margin: 10px;
+            padding: 20px;
         }
         input[type="file"] {
             display: none;
@@ -18,11 +17,23 @@
             display: inline-block;
             cursor: hand;
         }
+
     </style>
 </head>
 <body>
-<h3>Pulse on QR codes </h3>
+
+<h3>Beam on QR codes </h3>
+
 <div id="message"> Waiting for a file. Click on QR to load when instructed.</div>
+
+<h4> Beam Setting: </h4>
+<label for="workdelay">  Beam Delay (ms):
+    <input type="text" id="workdelay" value="5000">
+</label></br>
+<label for="dinterval">  Beam Frequency (ms):
+    <input type="text" id="dinterval" value="600">
+</label></br>
+
 <label for="file-upload" class="custom-file-upload">
     <input id="file-upload" type='file' accept='text/plain'><br>
     <div id="output" class="output"></div>
@@ -74,9 +85,10 @@
                 if (curChunkIndex >= chunks.length) {
                     curChunkIndex = 0;
                     clearInterval(qrGenInterval);
-                    genQRCode("stop", "black");
+                    genQRCode("stop", "green");
+                    $('#message').text("Beaming stopped.");
                 }else{
-                    genQRCode(chunks[curChunkIndex], "green");
+                    genQRCode(chunks[curChunkIndex], "black");
                 }
             }, dinterval);
 
@@ -84,8 +96,9 @@
 
         var openFile = function(event) {
             var input = event.target;
-            var workdelay = 5000;
-            var dinterval = 600;
+            var workdelay = document.getElementById('workdelay').value;
+            var dinterval = document.getElementById('dinterval').value;
+
             var node = '#output';
             var reader = new FileReader();
             reader.onload = function(){
@@ -108,13 +121,12 @@
             reader.readAsDataURL(input.files[0]); // > encodes to BAse64
         };
 
-        console.log("Beamed start");
         $('#output').qrcode(
                 {
                     render: 'div',
                     ecLevel: 'L',
                     text: "start",
-                    fill: "green",
+                    fill: "red",
                     size: 250,
                     mode: 0,
                     minVersion: 21,

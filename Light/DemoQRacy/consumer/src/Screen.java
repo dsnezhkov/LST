@@ -1,23 +1,24 @@
+import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.io.*;
 import java.util.Base64;
 
-import javax.imageio.ImageIO;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Color;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import javax.imageio.ImageIO;
 
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
@@ -26,7 +27,7 @@ import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
 /**
- * Capture a portion of the screen, data from QRCode
+ * Capture a portion of the screen, get data from a QRCode, process data and save it into file.
  */
 public class Screen{
 
@@ -92,18 +93,19 @@ public class Screen{
     }
     public static void main(String[] args) throws NotFoundException, IOException, InterruptedException {
 
-        Boolean Debug=true;
+        Boolean Debug = false;
         try {
             Robot robot = new Robot();
 
             String b64data;             // Clean encoded string
             String b64data_raw = "";    // Read  encoded string
-            String b64data_prev = "";   // Buffer encoded string
+            String b64data_prev = "";   // Previous Buffer encoded string
+
             StringBuilder sb = new StringBuilder();
-            Integer captureHeight = 250;
-            Integer captureWidth = 250;
-            Integer scannerInterval= 300;
-            String recvDataFile = "data";
+            Integer captureHeight = 250; // Y
+            Integer captureWidth = 250;  // X
+            Integer scannerInterval= 300; // Frequency
+            String recvDataFile = "data"; // File to save data to
 
             if (Debug){
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -117,30 +119,22 @@ public class Screen{
             }
 
 
-            System.out.println(">>> Place mouse over top left(x,y) of capture. [Enter] when ready");
+            System.out.println(">>> Place mouse over top left(x,y) of capture. Press [Enter] when ready");
             System.console().readLine();
             Point tl = MouseInfo.getPointerInfo().getLocation();
             Double tlX = tl.getX();
             Integer tlXi = tlX.intValue();
             Double tlY = tl.getY();
             Integer tlYi = tlY.intValue();
-            System.out.println("Mouse [Top Left] read: X:" + tlXi + " Y: " + tlYi);
+            System.out.println("Mouse Control: X:" + tlXi + " Y: " + tlYi);
 
 
-            System.out.println(">>> Place mouse over control pixel in QR Code. [Enter] when ready");
-            System.console().readLine();
-            Point cp = MouseInfo.getPointerInfo().getLocation();
-            Double cpX = cp.getX();
-            Integer cpXi = cpX.intValue();
-            Double cpY = cp.getY();
-            Integer cpYi = cpY.intValue();
-            System.out.println("Mouse [Control] read : X:" + cpXi + " Y: " + cpYi);
-            Color ctrlColor = robot.getPixelColor(cpXi,cpYi);
+            /* Color ctrlColor = robot.getPixelColor(cpXi,cpYi);
             String ctrlColorRGB = Integer.toHexString(ctrlColor.getRGB());
             ctrlColorRGB = ctrlColorRGB.substring(2, ctrlColorRGB.length());
             System.out.println("Watch for control pixel color (sRGB native) on this computer: #"  + ctrlColorRGB);
-
-            System.out.println(">>> Load File in QR Emitter. [Enter] when ready to read");
+            */
+            System.out.println(">>> Load File in QR Emitter. Press [Enter] when ready to read");
             System.out.println("Scanner Interval " + scannerInterval + "ms");
             System.console().readLine();
 
@@ -150,23 +144,8 @@ public class Screen{
 
                 Thread.sleep(scannerInterval);
 
-                // Wait for stop and save data to file
-                // We cannot rely on HTML colors and native colors be the same. 
-                // TODO: calibrate function and check against that value
-                if (robot.getPixelColor(cpXi,cpYi).equals(Color.black) ){
-                    System.out.println("<<< Stop QR Capture");
-                    byte[] decoded = Base64.getDecoder().decode(sb.toString());
-
-                    if (Debug){
-                        System.out.println("::: Data received (decoded): "
-                                + new String(decoded, "UTF-8"));
-                    }
-
-                    System.out.println("::: Saving Data to  " + recvDataFile );
-                    writeDataFile(decoded, recvDataFile);
-                    break;
-                }
-                Rectangle captureRect = new Rectangle(tlXi, tlYi, captureHeight, captureWidth); // positions
+                // Define capture positions
+                Rectangle captureRect = new Rectangle(tlXi, tlYi, captureHeight, captureWidth);
 
                 // Capture screen area
                 BufferedImage screenImage = robot.createScreenCapture(captureRect);
@@ -174,25 +153,48 @@ public class Screen{
                    writeImgFile(screenImage, i++);
                 }
 
-                // Guide QR decoder
+                // Guide QR decoder with hints
                 Map hintMap = new HashMap();
                 hintMap.put(DecodeHintType.CHARACTER_SET, CharacterSetECI.UTF8);
                 hintMap.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
                 hintMap.put(DecodeHintType.TRY_HARDER, true);
 
+                if (Debug){
+                    System.out.println("Going to readQRCodeBuffer()");
+                }
+
                 b64data_raw=readQRCodeBuffer(screenImage, hintMap);
 
-                // Skip "seen" QR codes (scanner is faster that emitter)
+                if (Debug){
+                    System.out.println(b64data_raw);
+                }
+
+                if(b64data_raw.equals("start")){
+                    System.out.print(".");
+                    continue;
+                }
+                if(b64data_raw.equals("stop")){
+                    System.out.println("[+] Stopping QR Capture");
+                    byte[] decoded = Base64.getDecoder().decode(sb.toString());
+
+                    if (Debug){
+                        System.out.println("[+] Data received (decoded): "
+                                + new String(decoded, "UTF-8"));
+                    }
+
+                    System.out.println("[+] Saving Data to  " + recvDataFile );
+                    writeDataFile(decoded, recvDataFile);
+                    break;
+                }
+
+                // Skip "seen" QR codes (scanner is faster than emitter)
                 if (b64data_raw.equals(b64data_prev)){
-                        assert true;
+                    continue;
+
                 }else{
                     // Handler for Stop/Start markers. Skip for now
-                    if (b64data_raw.equals("start") || b64data_raw.equals("stop")){
-                        System.out.print(".");
-                        continue;
-                    }
                     b64data = b64data_raw.replaceAll("_", "=");
-                    System.out.println("[+] " + b64data);
+                    System.out.println("> " + b64data);
                     sb.append(b64data);
                     b64data_prev = b64data_raw;
                 }
@@ -200,8 +202,7 @@ public class Screen{
 
             long stopTime = System.currentTimeMillis();
             long elapsedTime = stopTime - startTime;
-            System.out.println("--------------------------");
-            System.out.println("Execution time (s): " + elapsedTime/1000);
+            System.out.println("Done. Execution time (s): " + elapsedTime/1000);
 
            } catch (AWTException ex) {
             System.err.println(ex);
