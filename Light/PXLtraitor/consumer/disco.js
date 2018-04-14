@@ -1,3 +1,20 @@
+/*
+ disco.js
+
+ Examples:
+ // Calibrate: get exact pixel location under mouse
+ node disco.js  -c
+ // Poll from specific coordinates without use of a mouse
+ node disco.js  -m coords  -x 1179 -y 248
+ // Poll from specific coordinates without use of a mouse, and specify poll delay (ms)
+ node disco.js  -m coords  -x 1179 -y 248 -p 50
+ // Poll from coordinates with use of a mouse
+ node disco.js  -m mouse
+ // Poll from coordinates with use of a mouse, and specify poll delay (ms)
+ node disco.js  -m mouse -p 50
+ // Poll and save B64 into log.txt, and then convert into binary into hello.recv
+ node disco.js  -m coords -x 978 -y 228 -p 10 -l ./log.txt -o hello.recv
+ */
 const robot = require("robotjs");
 const sleep = require('sleep');
 const fs    = require('fs');
@@ -5,6 +22,7 @@ const btoa  = require('btoa');
 const commandLineArgs = require('command-line-args')
 
 
+// Gets mouse coordinates
 function getMouseCoords(){
     var mousecoords = [];
     mouseCoordObj = robot.getMousePos()
@@ -13,10 +31,13 @@ function getMouseCoords(){
     return mousecoords;
 }
 
+// Gets pixel color under cursor
 function getPixelColor(x,y){
 	return robot.getPixelColor(x,y);
 }
 
+// Records pixels in a bag
+// Decouples blue spectrum value and converts it back to B64 data
 function recordPixel(hexcolor, x, y){
 
     if ( (Hexcolor['current'] != hexcolor) && (hexcolor != fenceControl)){
@@ -46,6 +67,7 @@ function recordPixel(hexcolor, x, y){
 
 }
 
+// Reads pixels from the coordinates
 function readPixel(polldelay, coords){
     var x = coords[0];
     var y = coords[1];
@@ -90,6 +112,7 @@ function readPixel(polldelay, coords){
 
 }
 
+// Converst B64 -> data and dumps results in a file
 function convertFile(){
 
     fs.readFile(log, 'ascii', function (err,b64data) {
@@ -105,21 +128,6 @@ function convertFile(){
     });
 }
 
-/*
- Examples:
- // Calibrate: get exact pixel location under mouse
- node disco.js  -c
- // Poll from specific coordinates without use of a mouse
- node disco.js  -m coords  -x 1179 -y 248
- // Poll from specific coordinates without use of a mouse, and specify poll delay (ms)
- node disco.js  -m coords  -x 1179 -y 248 -p 50
- // Poll from coordinates with use of a mouse
- node disco.js  -m mouse
- // Poll from coordinates with use of a mouse, and specify poll delay (ms)
- node disco.js  -m mouse -p 50
- // Poll and save B64 into log.txt, and then convert into binary into hello.recv
- node disco.js  -m coords -x 978 -y 228 -p 10 -l ./log.txt -o hello.recv
- */
 const optionDefinitions = [
     { name: 'calibrate', alias: 'c', type: Boolean },
     { name: 'method', alias: 'm', type: String, multiple: false },
@@ -133,15 +141,14 @@ const optionDefinitions = [
 const options = commandLineArgs(optionDefinitions)
 
 var Hexcolor = {};
-// var stopControl='00ff00'; // HTML
-var stopControl='29fd2f';
-// var startControl='ff0000'; // HTML
-var startControl='fc0d1c';
-// var fenceControl='ff00ff'; // HTML
-var fenceControl='fd29fc';
+
+var startControl='ffffff';
+var stopControl='cccccc';
+var fenceControl='000000';
+
 var polldelay=20 // default poll delay
 var log='./log.txt' // default log file
-var out='./a.out' // default output file
+var out='./datafile' // default output file
 
 if ( options.calibrate === true) {
     while(1) {

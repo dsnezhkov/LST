@@ -7,9 +7,9 @@
             margin: 10px;
             border: 1px solid green;
         }
-        .sGuide { width: 60px; height: 20px; border: 0px; background: #ff0000; margin: 5px; display: inline-block; padding-left: 10px; }
-        .eGuide { width: 60px; height: 20px; border: 0px; background: #00ff00; margin: 5px; display: inline-block; padding-left: 10px; }
-        .fGuide { width: 60px; height: 20px; border: 0px; background: #ff00ff; margin: 5px; display: inline-block; padding-left: 10px;}
+        .sGuide { width: 60px; height: 20px; border: 0px; background: #ffffff; margin: 5px; display: inline-block; padding-left: 10px; }
+        .eGuide { width: 60px; height: 20px; border: 0px; background: #cccccc; margin: 5px; display: inline-block; padding-left: 10px; }
+        .fGuide { width: 60px; height: 20px; border: 0px; background: #000000; margin: 5px; display: inline-block; padding-left: 10px; color: white;}
         .square {
             width: 50px;
             height: 50px;
@@ -24,7 +24,7 @@
             border: 1px solid #ccc;
             display: inline-block;
             padding: 10px;
-            margin: 50px;
+            margin: 20px;
             background: ivory;
             cursor: hand;
         }
@@ -32,24 +32,39 @@
 </head>
 <body>
 <h3> Pulse on Blue spectrum, with fencing... </h3>
-<div class="guideBox">
-    <div class="sGuide">Start</div>
-    <div class="eGuide">Stop</div>
-    <div class="fGuide">Fence</div>
+
+
+<div>
+<h4> Beam Setting: </h4>
+<label for="workdelay">  Beam Delay (ms):
+    <input type="text" id="workdelay" value="5000">
+</label></br>
+<label for="dinterval">  Beam Frequency (ms):
+    <input type="text" id="dinterval" value="100">
+</label></br>
+<label for="fencewait">  Beam Fence Duration (ms):
+    <input type="text" id="fencewait" value="50">
+</label>
 </div>
+
+<h4> File select: </h4>
 <label for="file-upload" class="custom-file-upload">
     <input id="file-upload" type='file' accept='text/plain' onchange='openFile(event)'><br>
     <div id="output"></div>
 </label>
+
+<h4> Color Calibration Profile: </h4>
+<div class="guideBox">
+    <span class="sGuide">Start</span>
+    <span class="eGuide">Stop</span>
+    <span class="fGuide">Fence</span>
+</div>
+
 <script>
 
-    var dinterval = 100; // how often to blink bytes
-    var fencewait = 50;  // fence blink duration
-    var workdelay = 5000; // 5 sec lead time to get mouse in position or prepare serverside capture
-
-    var fenceHex = "#ff00ff";
-    var stopHex  = "#00ff00";
-    var startHex = "#ff0000";
+    var startHex = "#ffffff";
+    var stopHex  = "#cccccc";
+    var fenceHex = "#000000";
 
     var node = document.getElementById('output');
     node.className = 'square';
@@ -91,19 +106,22 @@
 
     var showFence = function (target) {
         target.style.background = fenceHex;
-        // console.log("Fence  #ff00ff");
+        // console.log("Fence  ");
     };
     var showStopControl = function (target) {
         target.style.background = stopHex;
-        // console.log("Stop  #00ff00");
+        // console.log("Stop  ");
     };
     var showStartControl = function (target) {
         target.style.background = startHex;
-        // console.log("Start  #ff0000");
+        // console.log("Start  ");
     };
 
     var openFile = function(event) {
         var input = event.target;
+        var workdelay = document.getElementById('workdelay').value; // Delay beaming
+        var dinterval = document.getElementById('dinterval').value; // how often to blink bytes
+        var fencewait = document.getElementById('fencewait').value; // fence blink duration
 
         var reader = new FileReader();
         reader.onload = function(){

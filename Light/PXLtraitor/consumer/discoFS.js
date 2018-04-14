@@ -1,3 +1,20 @@
+/*
+DiscoFS.js
+
+ Examples:
+ // Calibrate: get exact pixel location under mouse
+ node color.js  -c
+ // Poll from specific coordinates without use of a mouse
+ node color.js  -m coords  -x 1179 -y 248
+ // Poll from specific coordinates without use of a mouse, and specify poll delay (ms)
+ node color.js  -m coords  -x 1179 -y 248 -p 50
+ // Poll from coordinates with use of a mouse
+ node color.js  -m mouse
+ // Poll from coordinates with use of a mouse, and specify poll delay (ms)
+ node color.js  -m mouse -p 50
+ // Poll and save B64 into log.txt, and then convert into binary into hello.recv
+ node color.js  -m coords -x 978 -y 228 -p 10 -l ./log.txt -o hello.recv
+ */
 const robot = require("robotjs");
 const sleep = require('sleep');
 const fs    = require('fs');
@@ -5,6 +22,7 @@ const btoa  = require('btoa');
 const commandLineArgs = require('command-line-args')
 
 
+// Gets mous coords
 function getMouseCoords(){
     var mousecoords = [];
     mouseCoordObj = robot.getMousePos()
@@ -13,10 +31,12 @@ function getMouseCoords(){
     return mousecoords;
 }
 
+// Gets color of pixel under coords
 function getPixelColor(x,y){
 	return robot.getPixelColor(x,y);
 }
 
+// Records pixel color in a bag, applying  adjustments on deviation
 function recordPixel(hexcolor, x, y){
 
     var baseHexColor = "";
@@ -57,6 +77,7 @@ function recordPixel(hexcolor, x, y){
 
 }
 
+// Reads pixel 
 function readPixel(polldelay, coords){
     var x = coords[0];
     var  y = coords[1];
@@ -110,6 +131,7 @@ function readPixel(polldelay, coords){
 
 }
 
+// Dumps data to file
 function convertFile(){
 
     fs.readFile(log, 'ascii', function (err,b64data) {
@@ -125,6 +147,7 @@ function convertFile(){
     });
 }
 
+// Matching engine for HTML colors
 function createB64Colors(ccodes, charset) {
     var arr = {};
     for(var i = 0, ii = ccodes.length; i<ii; i++) {
@@ -133,6 +156,7 @@ function createB64Colors(ccodes, charset) {
     return arr;
 }
 
+// Logic to figure out similar (adjacent) colors
 function getSimilarColors (color) {
 
     //Convert to RGB, then R, G, B
@@ -158,7 +182,11 @@ function getSimilarColors (color) {
         var base_colors_b = base_color_rgb.split(',')[2];
 
         //Add the difference to the differenceArray
-        differenceArray.push( Math.sqrt((color_r-base_colors_r)* (color_r-base_colors_r)+ (color_g-base_colors_g)*(color_g-base_colors_g)+(color_b-base_colors_b)*(color_b-base_colors_b)));
+        differenceArray.push( 
+          Math.sqrt(
+(color_r-base_colors_r) * (color_r-base_colors_r) + (color_g-base_colors_g) * (color_g-base_colors_g) + (color_b-base_colors_b) * ( color_b - base_colors_b)
+          )
+        );
     }
 
     //Get the lowest number from the differenceArray
@@ -187,21 +215,6 @@ function getSimilarColors (color) {
     //Return the HEX code
     return ccodes[index];
 }
-/*
- Examples:
- // Calibrate: get exact pixel location under mouse
- node color.js  -c
- // Poll from specific coordinates without use of a mouse
- node color.js  -m coords  -x 1179 -y 248
- // Poll from specific coordinates without use of a mouse, and specify poll delay (ms)
- node color.js  -m coords  -x 1179 -y 248 -p 50
- // Poll from coordinates with use of a mouse
- node color.js  -m mouse
- // Poll from coordinates with use of a mouse, and specify poll delay (ms)
- node color.js  -m mouse -p 50
- // Poll and save B64 into log.txt, and then convert into binary into hello.recv
- node color.js  -m coords -x 978 -y 228 -p 10 -l ./log.txt -o hello.recv
- */
 const optionDefinitions = [
     { name: 'calibrate', alias: 'c', type: Boolean },
     { name: 'method', alias: 'm', type: String, multiple: false },
@@ -271,7 +284,25 @@ switch(options.method) {
         }
         break;
     default:
-        console.log('Methods: <<mouse|coords>>');
+  default:
+        var usage = `
+
+ USAGE Examples:
+
+ // Calibrate: get exact pixel location under mouse
+ node discoFS.js  -c
+ // Poll from specific coordinates without use of a mouse
+ node discoFS.js  -m coords  -x 1179 -y 248
+ // Poll from specific coordinates without use of a mouse, and specify poll delay (ms)
+ node discoFS.js  -m coords  -x 1179 -y 248 -p 50
+ // Poll from coordinates with use of a mouse
+ node discoFS.js  -m mouse
+ // Poll from coordinates with use of a mouse, and specify poll delay (ms)
+ node discoFS.js  -m mouse -p 50
+ // Poll and save B64 into log.txt, and then convert into binary into hello.recv
+ node discoFS.js  -m coords -x 978 -y 228 -p 10 -l ./log.txt -o hello.recv
+`
+        console.log(`${usage}`);
         return
 }
 

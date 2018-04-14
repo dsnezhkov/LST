@@ -25,20 +25,20 @@ var saveData = (function () {
     };
 }());
 
-// 
+// Save Decoded in text 
 function saveFileA(){
-
-    fileName = makeFName(8) + ".txt";
-    saveData(decodedData, "text/plain", fileName);
-}
-// Plain TXT
-function saveFileM(){
 
     fileName = makeFName(8) + ".txt";
     saveData(original.value, "text/plain", fileName);
 }
+// Save Encoded
+function saveFileM(){
 
-// Binary
+    fileName = makeFName(8) + ".txt";
+    saveData(incoming.value, "text/plain", fileName);
+}
+
+// Save Decoded in binary
 function saveFileB(){
 
    fileName = makeFName(8) + ".bin";
@@ -68,11 +68,26 @@ var original = document.getElementById('original');
 incoming.scrollTop = incoming.scrollHeight;
 
 var dbutton = document.getElementById("dbutton"); 
+
+/*
+    <button class="button" id="obutton" type="button">Decode B64</button>
+    <button class="button" id="sebutton" type="button">Save Encoded (B64)</button>
+    <button class="button" id="spbutton" type="button">Save Decoded (Txt)</button>
+    <button class="button" id="sbbutton" type="button">Save Decoded (Bin)</button>
+*/
+/*
+    <button class="button" id="cebutton" type="button">Clear Displayed Encoded Contents</button>
+    <button class="button" id="cpbutton" type="button">Clear Displayed Plain Contents</button>
+*/
+
 var obutton = document.getElementById("obutton"); 
-var sbutton = document.getElementById("sbutton"); 
-var abutton = document.getElementById("abutton"); 
-var cbutton = document.getElementById("cbutton"); 
-var tbutton = document.getElementById("tbutton"); 
+var spbutton = document.getElementById("spbutton"); 
+var sebutton = document.getElementById("sebutton"); 
+var sbbutton = document.getElementById("sbbutton"); 
+
+var cebutton = document.getElementById("cebutton"); 
+var cpbutton = document.getElementById("cpbutton"); 
+
 var decodedData;
 
 // Event Listeners
@@ -100,36 +115,34 @@ incoming.addEventListener('keydown',function(e) {
 },false);
 
 
-// Decode manual buffer
+
+// Decode manual buffer (B64 -> plain)
 obutton.addEventListener("click", function(e) { 
     decodeKbd(e.target);
 });
 
 // Save decoded data as binary
-sbutton.addEventListener("click", function(e) { 
+sbbutton.addEventListener("click", function(e) { 
     saveFileB(e.target);
 });
 
 // Save decoded data as text
-abutton.addEventListener("click", function(e) { 
+spbutton.addEventListener("click", function(e) { 
     saveFileA(e.target);
 });
 
-// Save manually entered data as text
-abutton.addEventListener("click", function(e) { 
+// Save encoded data as encoded data
+sebutton.addEventListener("click", function(e) { 
     saveFileM(e.target);
 });
 
-// Clear rendered results
-cbutton.addEventListener("click", function(e) { 
-    clearResults(e.target);
+// Clear encoded data container
+cebutton.addEventListener("click", function(e) { 
+    clearIResults(e.target);
 });
 
-// Clear transitional Data bag and reload
-tbutton.addEventListener("click", function(e) { 
-    location.reload();
+// Clear decoded data container
+cpbutton.addEventListener("click", function(e) { 
+    clearOResults(e.target);
 });
-
-
-
 
