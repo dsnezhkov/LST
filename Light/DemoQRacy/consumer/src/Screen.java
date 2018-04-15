@@ -20,6 +20,14 @@ import java.awt.Color;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.HelpFormatter;
+
 import com.google.zxing.*;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.CharacterSetECI;
@@ -28,6 +36,7 @@ import com.google.zxing.qrcode.QRCodeReader;
 
 /**
  * Capture a portion of the screen, get data from a QRCode, process data and save it into file.
+ *  Screen -x 40 -y 323 -f /tmp/hello.c -i 35 -v
  */
 public class Screen{
 
@@ -94,6 +103,88 @@ public class Screen{
     public static void main(String[] args) throws NotFoundException, IOException, InterruptedException {
 
         Boolean Debug = false;
+        Integer captureHeight = 250; // Y
+        Integer captureWidth = 250;  // X
+        Integer scannerInterval= 30; // Frequency: default 300
+        String recvDataFile = "data"; // File to save data to
+        Integer coordX = 0;
+        Integer coordY = 0;
+
+
+        CommandLineParser parser = new DefaultParser();
+
+        Options options = new Options();
+
+
+        options.addOption("h", "help", false, "display usage");
+        options.addOption("v", "verbose", false, "verbose run info");
+        options.addOption(
+             Option.builder("f")
+               .longOpt( "file" )
+               .desc( "Absolute path to file"  )
+               .hasArg()
+               .argName( "F" )
+               .required(false)
+               .build()
+            );
+        options.addOption(
+             Option.builder("x")
+               .longOpt( "coordX" )
+               .desc( "X coordinate (pixel offset)"  )
+               .hasArg()
+               .argName( "X" )
+               .required(false)
+               .build()
+            );
+        options.addOption(
+             Option.builder("y")
+               .longOpt( "coordY" )
+               .desc( "Y coordinate (pixel offset)"  )
+               .hasArg()
+               .argName( "Y" )
+               .required(false)
+               .build()
+            ); 
+        options.addOption(
+             Option.builder("i")
+               .longOpt( "interval" )
+               .desc( "Scanner Interval"  )
+               .hasArg()
+               .argName( "I" )
+               .required(false)
+               .build()
+            ); 
+
+        try {
+
+            CommandLine cmd = parser.parse( options, args);
+            if(cmd.hasOption("h")) {
+                System.out.println();
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp( "Screen", options );
+                return;
+            }
+            if(cmd.hasOption("v")) {
+                Debug = true;
+            }
+            if(cmd.hasOption("f")) {
+                recvDataFile = cmd.getOptionValue("f");
+            }
+            if(cmd.hasOption("x")) {
+                coordX = Integer.parseInt(cmd.getOptionValue("x"));
+            }
+            if(cmd.hasOption("y")) {
+                coordY = Integer.parseInt(cmd.getOptionValue("y"));
+            }
+            if(cmd.hasOption("i")) {
+                scannerInterval = Integer.parseInt(cmd.getOptionValue("i"));
+            }
+
+        }catch(ParseException pe){
+            System.err.println("Unable to parse Options: " + pe.getMessage());
+            System.exit(2);
+        }
+
         try {
             Robot robot = new Robot();
 
@@ -102,10 +193,6 @@ public class Screen{
             String b64data_prev = "";   // Previous Buffer encoded string
 
             StringBuilder sb = new StringBuilder();
-            Integer captureHeight = 250; // Y
-            Integer captureWidth = 250;  // X
-            Integer scannerInterval= 300; // Frequency
-            String recvDataFile = "data"; // File to save data to
 
             if (Debug){
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -119,7 +206,7 @@ public class Screen{
             }
 
 
-            System.out.println(">>> Place mouse over top left(x,y) of capture. Press [Enter] when ready");
+            /*System.out.println(">>> Place mouse over top left(x,y) of capture. Press [Enter] when ready");
             System.console().readLine();
             Point tl = MouseInfo.getPointerInfo().getLocation();
             Double tlX = tl.getX();
@@ -127,6 +214,7 @@ public class Screen{
             Double tlY = tl.getY();
             Integer tlYi = tlY.intValue();
             System.out.println("Mouse Control: X:" + tlXi + " Y: " + tlYi);
+            */
 
 
             /* Color ctrlColor = robot.getPixelColor(cpXi,cpYi);
@@ -134,9 +222,10 @@ public class Screen{
             ctrlColorRGB = ctrlColorRGB.substring(2, ctrlColorRGB.length());
             System.out.println("Watch for control pixel color (sRGB native) on this computer: #"  + ctrlColorRGB);
             */
-            System.out.println(">>> Load File in QR Emitter. Press [Enter] when ready to read");
+
+            /*System.out.println(">>> Load File in QR Emitter. Press [Enter] when ready to read");
             System.out.println("Scanner Interval " + scannerInterval + "ms");
-            System.console().readLine();
+            System.console().readLine();*/
 
             int i = 0;
             long startTime = System.currentTimeMillis();
@@ -145,7 +234,8 @@ public class Screen{
                 Thread.sleep(scannerInterval);
 
                 // Define capture positions
-                Rectangle captureRect = new Rectangle(tlXi, tlYi, captureHeight, captureWidth);
+                // Rectangle captureRect = new Rectangle(tlXi, tlYi, captureHeight, captureWidth);
+                Rectangle captureRect = new Rectangle(coordX, coordY, captureHeight, captureWidth);
 
                 // Capture screen area
                 BufferedImage screenImage = robot.createScreenCapture(captureRect);
