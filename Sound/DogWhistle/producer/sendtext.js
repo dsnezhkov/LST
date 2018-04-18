@@ -1,8 +1,9 @@
 var TextTransmitter = (function() {
+
     Quiet.init({
         profilesPrefix: "/",
         memoryInitializerPrefix: "/",
-        libfecPrefix: "/"
+        libfecPrefix: "/" 
     });
     var btn;
     var textbox;
@@ -51,5 +52,6 @@ var TextTransmitter = (function() {
         Quiet.addReadyCallback(onQuietReady, onQuietFail);
     };
 
-    document.addEventListener("DOMContentLoaded", onDOMLoad);
+    /* dxs: Disable for on-demand profile load */
+    // document.addEventListener("DOMContentLoaded", onDOMLoad);
 })();

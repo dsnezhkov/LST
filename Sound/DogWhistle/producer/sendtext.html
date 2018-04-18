@@ -1,27 +1,123 @@
-<!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Send Text</title>
+    <title>Sound::Modulaton</title>
+
+    <link rel="stylesheet" href="sendtext.css">
 
     <script type="text/javascript" src="/quiet.js"></script>
-    <script type="text/javascript" src="/sendtext.js"></script>
     <script async type="text/javascript" src="/quiet-emscripten.js"></script>
+
   </head>
+
   <body>
-    <div class="hidden" data-quiet-profile-name="audible-7k-channel-0"></div>
+    <h1> Beam on Modulaton :: SEND</h1>
     <div class="wrapper">
-      <header>
-        <h1>Send Text</h1>
-      </header>
-      <section>
-      <div class="hidden" data-quiet-warning></div>
-      <div class="form-group">
-        <textarea autofocus="true" autocapitalize="none" autocomplete="off" spellcheck="off" class="form-control" style="resize:none" rows="5" data-quiet-text-input></textarea>
-      </div>
-      <button type="button" class="btn btn-default" style="width:100%" data-quiet-send-button data-quiet-sending-text="Sending...">Send</button>
-      </section>
+        
+        <label for="file-upload" class="custom-file-upload">
+            <input id="file-upload" type='file' accept='text/plain' onchange='openFile(event)'><br>
+            <span id="fmessage">Select File</span>
+        </label>
+
+        <label for="qprofile-select">
+            <select id="qprofile-select" onchange="setQProfile()" class="styled-select semi-square">
+                <option disabled selected value="">Select Profile</option>
+                <option value="audible">audible</option>
+                <option value="audible-7k-channel-0">audible-7k-channel-0</option>
+                <option value="audible-7k-channel-1">audible-7k-channel-1</option>
+                <option value="cable-64k">cable-64k</option>
+                <option value="hello-world">hello-world</option>
+                <option value="ultrasonic">ultrasonic</option>
+                <option value="ultrasonic-3600">ultrasonic-3600</option>
+                <option value="ultrasonic-whisper">ultrasonic-whisper</option>
+                <option value="ultrasonic-experimental">ultrasonic-experimental</option>
+            </select>
+        </label>
+
+        <button type="button" class="buttonp"  onclick="initQS()">Load Profile</button>
+
+        <button type="button" class="buttons"  data-quiet-send-button 
+                data-quiet-sending-text="Sending...">Send Text</button></br>
+        <textarea id="outgoing" autofocus="false" autocapitalize="none" placeholder="File Contents here..."
+                autocomplete="off" spellcheck="off" class="form-control" data-quiet-text-input></textarea>
     </div>
+
+    <div class="hidden" data-quiet-warning></div>
+    <div class="hidden" id="qprofile" data-quiet-profile-name="audible-7k-channel-0"></div>
+
+    <script>
+
+       var btn = document.querySelector('[data-quiet-send-button]');
+       var textbox = document.querySelector('[data-quiet-text-input]');
+       var warningbox = document.querySelector('[data-quiet-warning]');
+       var transmit;
+
+       function onTransmitFinish() {
+            textbox.focus();
+            btn.addEventListener('click', onClick, false);
+            btn.disabled = false;
+            var originalText = btn.innerText;
+            btn.innerText = btn.getAttribute('data-quiet-sending-text');
+            btn.setAttribute('data-quiet-sending-text', originalText);
+        };
+
+       function onClick(e) {
+            e.target.removeEventListener(e.type, arguments.callee);
+            e.target.disabled = true;
+            var originalText = e.target.innerText;
+            e.target.innerText = e.target.getAttribute('data-quiet-sending-text');
+            e.target.setAttribute('data-quiet-sending-text', originalText);
+            var payload = textbox.value;
+            if (payload === "") {
+                onTransmitFinish();
+                return;
+            }
+            transmit.transmit(Quiet.str2ab(payload));
+       };
+
+       function onQuietReady() {
+            console.log("QS sources profile");
+            var profilename = document.querySelector('[data-quiet-profile-name]').getAttribute('data-quiet-profile-name');
+            transmit = Quiet.transmitter({profile: profilename, onFinish: onTransmitFinish});
+            btn.addEventListener('click', onClick, false);
+        };
+
+       function onQuietFail(reason) {
+            console.log("quiet failed to initialize: " + reason);
+            warningbox.classList.remove("hidden");
+            warningbox.textContent = "Sorry, it looks like there was a problem (" + reason + ")";
+       };
+
+       var initQS = function (){
+            Quiet.init({
+                    profilesPrefix: "/",
+                    memoryInitializerPrefix: "/",
+                    libfecPrefix: "/"
+            });
+
+            Quiet.addReadyCallback(onQuietReady, onQuietFail);
+       };
+       var setQProfile = function (){
+
+            var qprofileSelector = document.getElementById("qprofile-select");
+            var qprofile = document.getElementById('qprofile')
+            qprofile.setAttribute("data-quiet-profile-name", 
+                            qprofileSelector.options[qprofileSelector.selectedIndex].value);
+            console.log("TX Profile: " + qprofile.getAttribute("data-quiet-profile-name"));
+       };
+
+       var openFile = function (event, elem) {
+            
+           var input = event.target;
+           var reader = new FileReader();
+           var data;
+           reader.onload = function () {
+               var data = reader.result;
+               document.getElementById('outgoing').value = data;
+           };
+           reader.readAsText(input.files[0]);
+           fmessage.textContent="File Selected." ;
+      };
+    </script>
+
   </body>
 </html>

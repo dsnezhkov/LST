@@ -1,0 +1,71 @@
+#outgoing {
+	width: 400px;
+	height: 500px;
+	font-size: 18px; 
+	color: #1A5276 ;
+	border: 3px solid grey;
+    margin-left: 10px;
+    background: ivory;
+}
+
+div{
+	 font-family: Tahoma, Verdana, Segoe, sans-serif;
+	 padding: 10px;
+}
+.buttonp{
+	 background-color: #cccccc;
+	 border: 1px solid ivory;
+	 color: black;
+	 padding: 5px 5px;
+	 text-align: center;
+	 text-decoration: none;
+	 font-size: 16px;
+     margin-bottom: 20px;
+}
+.buttons{
+	 background-color: #D35400;
+	 border: 1px solid ivory;
+	 color: white;
+	 padding: 5px 5px;
+	 text-align: center;
+	 text-decoration: none;
+	 font-size: 16px;
+     margin-bottom: 20px;
+}
+
+input[type="file"] {
+    display: none;
+}
+.custom-file-upload {
+    display: inline-block;
+    padding: 5px;
+    margin-left: 5px;
+	text-align: center;
+    text-decoration: underline;
+	font-size: 20px;
+    color: black;
+    cursor: hand;
+}
+
+.semi-square {
+   -webkit-border-radius: 5px;
+   -moz-border-radius: 5px;
+   border-radius: 5px;
+}
+
+.styled-select {
+   background: ivory;
+   height: 30px;
+   overflow: hidden;
+   width: 250px;
+   margin-left: 10px;
+}
+
+.styled-select select {
+   background: transparent;
+   border: none;
+   font-size: 20px;
+   height: 29px;
+   padding: 5px; 
+   width: 268px;
+}

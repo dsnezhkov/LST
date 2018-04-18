@@ -1,24 +1,101 @@
-<!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Receive Text</title>
-
+    <title>Sound::Modulaton</title>
+    <link rel="stylesheet" href="receivetext.css">
     <script type="text/javascript" src="/quiet.js"></script>
-    <script type="text/javascript" src="/receivetext.js"></script>
     <script async type="text/javascript" src="/quiet-emscripten.js"></script>
   </head>
+
   <body>
-    <div class="hidden" data-quiet-profile-name="audible-7k-channel-0"></div>
+    <h1> Beam on Modulaton :: RECV </h1>
     <div class="wrapper">
-      <header>
-        <h1>Receive Text</h1>
-      </header>
-      <section>
-      <div class="hidden" data-quiet-warning></div>
-      <pre data-quiet-receive-text-target>Your received text will show up here. Waiting...</pre>
-      </section>
+        <div class="hidden" data-quiet-warning></div>
+        
+        <label for="qprofile-select">
+            <select id="qprofile-select" onchange="setQProfile()" class="styled-select semi-square">
+                <option disabled selected value="">Select Profile</option>
+                <option value="audible">audible</option>
+                <option value="audible-7k-channel-0">audible-7k-channel-0</option>
+                <option value="audible-7k-channel-1">audible-7k-channel-1</option>
+                <option value="cable-64k">cable-64k</option>
+                <option value="hello-world">hello-world</option>
+                <option value="ultrasonic">ultrasonic</option>
+                <option value="ultrasonic-3600">ultrasonic-3600</option>
+                <option value="ultrasonic-whisper">ultrasonic-whisper</option>
+                <option value="ultrasonic-experimental">ultrasonic-experimental</option>
+            </select>
+        </label>
+
+        <button type="button" class="buttonp"  onclick="initQS()">Load Profile / Receive</button>
+
     </div>
+
+    <!-- <pre data-quiet-receive-text-target></pre> -->
+    <textarea data-quiet-receive-text-target id="incoming" autofocus="false" autocapitalize="none" 
+      placeholder="Transmission Contents here..." autocomplete="off" spellcheck="off" class="form-control"></textarea>
+
+    <div class="hidden" id="qprofile" data-quiet-profile-name="audible"></div>
+    <script>
+
+      var target = document.querySelector('[data-quiet-receive-text-target]');
+      var warningbox = document.querySelector('[data-quiet-warning]');
+      var content = new ArrayBuffer(0);
+
+      function onReceive(recvPayload) {
+          content = Quiet.mergeab(content, recvPayload);
+          // target.textContent = Quiet.ab2str(content);
+          target.value = Quiet.ab2str(content);
+          warningbox.classList.add("hidden");
+      };
+
+      function onReceiverCreateFail(reason) {
+          console.log("failed to create quiet receiver: " + reason);
+          warningbox.classList.remove("hidden");
+          warningbox.textContent = "Sorry, it looks like QS is not supported by your browser. Please give permission to use the microphone or try again in Google Chrome or Microsoft Edge."
+      };
+
+      function onReceiveFail(num_fails) {
+          warningbox.classList.remove("hidden");
+          warningbox.textContent = "Fails: " + num_fails + " We didn't quite get that. It looks like you tried to transmit something. You may need to move the transmitter closer to the receiver and set the volume to 50%."
+      };
+
+      function onQuietReady() {
+          console.log("QS sources profile");
+          var profilename = document.querySelector('[data-quiet-profile-name]').getAttribute('data-quiet-profile-name');
+          Quiet.receiver({profile: profilename,
+             onReceive: onReceive,
+             onCreateFail: onReceiverCreateFail,
+             onReceiveFail: onReceiveFail
+        });
+      };
+
+      function onQuietFail(reason) {
+          console.log("quiet failed to initialize: " + reason);
+          warningbox.classList.remove("hidden");
+          warningbox.textContent = "Sorry, it looks like there was a problem (" + reason + ")";
+      };
+
+      var initQS = function (){
+              Quiet.init({
+                    profilesPrefix: "/",
+                    memoryInitializerPrefix: "/",
+                    libfecPrefix: "/"
+            });
+
+            Quiet.addReadyCallback(onQuietReady, onQuietFail);
+       };
+      var setQProfile = function (){
+
+            var qprofileSelector = document.getElementById("qprofile-select");
+            var qprofile = document.getElementById('qprofile')
+            qprofile.setAttribute("data-quiet-profile-name", 
+                            qprofileSelector.options[qprofileSelector.selectedIndex].value);
+            console.log("TX Profile: " + qprofile.getAttribute("data-quiet-profile-name"));
+            document.getElementById('incoming').value = "";
+      };
+
+
+    </script>
+
   </body>
 </html>
