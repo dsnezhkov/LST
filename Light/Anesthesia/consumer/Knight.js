@@ -97,6 +97,7 @@ var kbutton = document.getElementById("kbutton");
 var abutton = document.getElementById("abutton"); 
 var cbutton = document.getElementById("cbutton"); 
 var tbutton = document.getElementById("tbutton"); 
+var ebutton = document.getElementById("ebutton"); 
 var decodedData;
 var transitionalDataBag = [];
 
