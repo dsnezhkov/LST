@@ -52,6 +52,12 @@ function saveFileA(){
 function saveFileM(){
 
     fileName = makeFName(8) + ".txt";
+    saveData(original.value, "text/plain", fileName);
+}
+// Manual B64 entry -> txt
+function saveFileE(){
+
+    fileName = makeFName(8) + ".txt";
     saveData(incoming.value, "text/plain", fileName);
 }
 
@@ -87,6 +93,7 @@ var map = document.getElementById("map");
 var dbutton = document.getElementById("dbutton"); 
 var obutton = document.getElementById("obutton"); 
 var sbutton = document.getElementById("sbutton"); 
+var kbutton = document.getElementById("kbutton"); 
 var abutton = document.getElementById("abutton"); 
 var cbutton = document.getElementById("cbutton"); 
 var tbutton = document.getElementById("tbutton"); 
@@ -149,8 +156,12 @@ abutton.addEventListener("click", function(e) {
 });
 
 // Save manually entered data as text
-abutton.addEventListener("click", function(e) { 
+kbutton.addEventListener("click", function(e) { 
     saveFileM(e.target);
+});
+// Save manually entered data as text
+ebutton.addEventListener("click", function(e) { 
+    saveFileE(e.target);
 });
 
 // Clear rendered results

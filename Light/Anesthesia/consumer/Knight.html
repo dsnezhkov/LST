@@ -5,7 +5,7 @@
 
     <body>
 
-
+        <h3> Anesthesia: Beam in (Mouse clicks)</h3>
 		<div class="container">
 		  <div class="fixed">
 
@@ -83,25 +83,26 @@
 			  </div>
 			  <div class="flex-item">
 					<p>
-						<textarea id="incoming" placeholder="Incoming B64 Data displayed here"></textarea>
+						<textarea id="incoming" placeholder="(I)ncoming B64 Data displayed here"></textarea>
 					</p>
 					<p>
-						<textarea id="original" placeholder="Original string Data displayed here" ></textarea>
+						<textarea id="original" placeholder="(O)riginal string Data displayed here" ></textarea>
 					</p>
 			  </div>
 			  <div class="flex-item">
 					<p>
-						<button class="button" id="rbutton" type="button">Display B64</button>
-						<button class="button" id="dbutton" type="button">Decode Buffer</button>
-						<button class="button" id="obutton" type="button">Decode Manual</button>
-						<button class="button" id="sbutton" type="button">Save Manual (Txt)</button>
+						<button class="button" id="rbutton" type="button">Dump Buffer (I)</button>
+						<button class="button" id="dbutton" type="button">Decode Buffer (O)</button>
+						<button class="button" id="obutton" type="button">Decode Manual (O)</button>
 						<button class="button" id="sbutton" type="button">Save Buffer (Bin)</button>
 						<button class="button" id="abutton" type="button">Save Buffer (Txt)</button>
+						<button class="button" id="mbutton" type="button">Save B64 (I)</button>
+						<button class="button" id="kbutton" type="button">Save Txt (O)</button>
 					</p>
                     <hr/>
 					<p>
-						<button class="button" id="cbutton" type="button">Clear Displayed Contents</button>
-						<button class="button" id="tbutton" type="button">Clear Recv Buffers</button>
+						<button class="button" id="cbutton" type="button">Clear Contents (I/O)</button>
+						<button class="button" id="tbutton" type="button">Clear Buffers</button>
 					</p>
 			  </div>
 
