@@ -42,7 +42,7 @@ var saveData = (function () {
     };
 }());
 
-// Human Redable
+// Human Readable
 function saveFileA(){
 
     fileName = makeFName(8) + ".txt";
