@@ -46,7 +46,7 @@ public class Rook {
            .desc( "Absolute path to file"  )
            .hasArg()
            .argName( "FILE" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -55,7 +55,7 @@ public class Rook {
            .desc( "X coordinate (pixel offset)"  )
            .hasArg()
            .argName( "X" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -64,7 +64,7 @@ public class Rook {
            .desc( "Y coordinate (pixel offset)"  )
            .hasArg()
            .argName( "Y" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -73,7 +73,7 @@ public class Rook {
            .desc( "Delay Between Atomic Mouse Event (ms)"  )
            .hasArg()
            .argName( "DELAYA" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -82,7 +82,7 @@ public class Rook {
            .desc( "Delay Between Mouse Clicks (ms)"  )
            .hasArg()
            .argName( "DELAYXA" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -91,7 +91,7 @@ public class Rook {
            .desc( "X coordinate drift tolerance (pixels). Pixels between centers of tiles in image map on X")
            .hasArg()
            .argName( "XDRIFT" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -100,7 +100,7 @@ public class Rook {
            .desc( "Y coordinate drift tolerance (pixels). Pixels between centers of tiles in image map on Y")
            .hasArg()
            .argName( "YDRIFT" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -109,7 +109,7 @@ public class Rook {
            .desc( "Delay Target Window Focus (ms)")
            .hasArg()
            .argName( "DELAYW" )
-           .required(true)
+           .required(false)
            .build()
         );
 
