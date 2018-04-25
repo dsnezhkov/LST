@@ -43,7 +43,7 @@ public class KeyBorat {
            .desc( "Absolute path to file"  )
            .hasArg()
            .argName( "FILE" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -52,7 +52,7 @@ public class KeyBorat {
            .desc( "Mode of transfer: 1 - binary(b64) or 2 - text(ascii)"  )
            .hasArg()
            .argName( "MODE" )
-           .required(true)
+           .required(false)
            .build()
         );
      options.addOption(
@@ -89,7 +89,7 @@ public class KeyBorat {
         if(cmd.hasOption("h")) {
             System.out.println();
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "Rook", options );
+            formatter.printHelp( "KeyBorat", options );
             return;
         }
         if(cmd.hasOption("v")) {

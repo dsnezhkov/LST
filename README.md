@@ -194,7 +194,7 @@ Roles flip. Consumer -> Remote system. Producer -> Local system.
 #### Producer
 
 - Java 1.7+ 
-- Build distribution via `Light/Anesthesia/producer/scripts/build.sh`
+- Build distribution via `Touch/Anesthesia/producer/scripts/build.sh`
 
 - Run:
     - Get pixel pointer coordinates: `getPointer.sh`.
@@ -223,7 +223,7 @@ usage: Rook
 
 #### Consumer
 Locally launched `file://` resource of 
-`Light/Anesthesia/consumer/Knight.html` in the browser
+`Touch/Anesthesia/consumer/Knight.html` in the browser
 
 Dependency: (or any custom mapped image) 
 ```
@@ -244,10 +244,39 @@ Infiltration of data (test or binary) is accomplished via producer posting keyst
 *Cons*
 - locks up input channels
 
+
 #### Usage
+Roles flip. Consumer -> Remote system. Producer -> Local system.
+
+#### Producer
+
+- Java 1.7+ 
+- Build distribution via `Touch/KeyBorat/producer/scripts/build.sh`
+- Run: `run.sh -f ../../../../data/first.c -m2`
 ```
-TBD
+
+usage: KeyBorat
+ -a,--delay-aaction <DELAYA>    Delay Between Atomic Mouse Event (ms)
+ -A,--delay-caction <DELAYXA>   Delay Between Mouse Clicks (ms)
+ -f,--file <FILE>               Absolute path to file
+ -h,--help                      display usage
+ -m,--mode <MODE>               Mode of transfer: 
+                                    1 - binary(b64)
+                                    2 - text(ascii)
+ -v,--verbose                   verbose run info
+ -w,--window-delay <DELAYW>     Delay Target Window Focus (ms)
 ```
+
+#### Consumer
+
+Locally launched `file://` resource of 
+`Touch/Anesthesia/consumer/Knight.html` in the browser
+
+Dependencies: (local)
+```
+KeyBorat.css	KeyBorat.html	KeyBorat.js
+```
+
 
 ## Sound
 
