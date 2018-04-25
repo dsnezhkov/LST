@@ -270,7 +270,7 @@ usage: KeyBorat
 #### Consumer
 
 Locally launched `file://` resource of 
-`Touch/Anesthesia/consumer/Knight.html` in the browser
+`Touch/KeyBorat/consumer/KeyBorat.html` in the browser
 
 Dependencies: (local)
 ```
@@ -305,9 +305,64 @@ This method employs beaming tones over a range 64 frequencies to align with Base
 
 #### Installation and Invocation
 
+
+##### Producer
+
+Locally launched `file://` resource of 
+`Sound/ToneDeaf/producer/pitch.html` in the browser
+
+Dependencies (local):
+
 ```
-TBD
+webaudio_tools.js
 ```
+
+##### Consumer
+
+ - Java 1.7+ 
+ - Download TarsosDSP JAR or use the bundled version (/libs) - Algos. (https://0110.be/releases/TarsosDSP/TarsosDSP-latest)
+ - Download Apache Commons CLI or use the bundled version (/libs) - CLI options
+    (http://apache.osuosl.org//commons/cli/binaries/commons-cli-1.4-bin.tar.gz)
+
+ - Build distribution via `Sound/ToneDeaf/consumer/scripts/build.sh`
+ - Run : `run.sh`
+
+ ```
+      SETTINGS
+________________________
+Output file: ./output
+Data Pitch Barrier: 20
+Data Pitch slack: 3
+Start Pitch Mark: 150
+Start Pitch Mark Barrier: 10
+Stop Pitch Mark: 5000
+Stop Pitch Mark Barrier: 120
+Data Pitch Low Frequency: 180
+Data Pitch Frequency Gap: 40
+
+usage: PitchAnalyzer
+ -b,--pitch-barrier <NUMBER(Hz)>        +/- data pitch deviation tolerance
+                                        range (Hz) from base frequency
+ -d,--data-file <FILE>                  Output file for incoming data
+ -g,--pitch-gap <NUMBER(Hz)>            frequency intervals (Hz) to match
+                                        with charset.
+                                        Correlated with pitch-barrier
+ -h,--help                              display usage
+ -k,--pitch-slack <NUMBER>              data frequency series reading
+                                        adjustment
+ -l,--start-pitch-low <NUMBER(Hz)>      lowest frequency (Hz) for data
+                                        analysis
+ -p,--start-mark-barrier <NUMBER(Hz)>   +/- start pitch deviation
+                                        tolerance range (Hz) from base
+                                        frequency
+ -P,--stop-mark-barrier <NUMBER(Hz)>    +/- stop pitch deviation tolerance
+                                        range (Hz) from base frequency
+ -s,--start-pitch-mark <NUMBER(Hz)>     mark start data recording pitch
+                                        with this frequency
+ -S,--stop-pitch-mark <NUMBER(Hz)>      mark stop data recording pitch
+                                        with this frequency
+ -v,--verbose                           verbose run info
+ ```
 
 ### Via Modulation
 
