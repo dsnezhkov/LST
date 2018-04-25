@@ -11,7 +11,7 @@ We are operating in digital to analog to digital realm. This is the biggesrt cha
 ## Exfil::Light
  - PixelTraitor - exfltration on visual spectrum
  - PixelTraitor - exfiltration on colorcodes, with variance
- - DemoQRacy - QR-code exfiltraiton 
+ - DemoQRacy - QR-code exfiltraiton
 
 ## Exfil::Sound
  - ToneDeaf
@@ -77,11 +77,46 @@ It also has a pixel color adjustment algorithm to compensate for differences in 
 - Still higher than normal spread of color discrepancies.
 - Speed of serial beaming.
 
-### Installation and Invocation 
+### Usage
 
-```    
-TBD
-````
+#### Producer 
+
+Locally launched `file://` resource of `Light/PixelTraitor/producer/disco.html` in the browser
+
+or 
+
+Locally launched `file://` resource of `Light/PixelTraitor/producer/discoFS.html` in the browser
+
+#### Consumer
+
+- Install NodeJS. (This is not a hard requirement overall, and we will move to Java.)
+
+- install packages via `npm` to satify the following :
+```  javascript 
+const robot = require("robotjs");
+const sleep = require('sleep');
+const fs    = require('fs');
+const btoa  = require('btoa');
+const commandLineArgs = require('command-line-args')
+```
+
+- Usage:
+```
+ Examples:
+ // Calibrate: get exact pixel location under mouse
+ node color.js  -c
+ // Poll from specific coordinates without use of a mouse
+ node color.js  -m coords  -x 1179 -y 248
+ // Poll from specific coordinates without use of a mouse, and specify poll delay (ms)
+ node color.js  -m coords  -x 1179 -y 248 -p 50
+ // Poll from coordinates with use of a mouse
+ node color.js  -m mouse
+ // Poll from coordinates with use of a mouse, and specify poll delay (ms)
+ node color.js  -m mouse -p 50
+ // Poll and save B64 into log.txt, and then convert into binary into hello.recv
+ node color.js  -m coords -x 978 -y 228 -p 10 -l ./log.txt -o hello.recv
+ */
+```
 
 ### DemoQRacy
 
@@ -104,9 +139,33 @@ Cons
 - Jquery small QR code library dependency. Luckily CDN is almost always allowed if any access to Internet is allowed. 
 - Minified it can also be brought in the captive environment easily.
 
-### Installation and Invocation
-```
-TBD
+### Usage
+
+#### Producer 
+
+Locally launched `file://` resource of 
+`Light/DemoQRacy/producer/qrbeamer.html` in the browser
+
+Dependency: Direct access to `https://cdnjs.cloudflare.com/ajax/libs/lrsjng.jquery-qrcode/0.14.0` and JQuery on the live Internet, or adjust for a local copy.
+
+#### Consumer
+
+- Java 1.7+
+- Build distribution via `Light/DemoQRacy/consumer/scripts/build.sh`
+
+- Run:
+    - Get pixel pointer coordinates: `pointer.sh`.
+    - Run `./run.sh -x 40 -y 323 -f /tmp/hello.c -i 35 -v` 
+
+Parameters:
+``` 
+usage: Screen
+ -f,--file <F>       Absolute path to file
+ -h,--help           display usage
+ -i,--interval <I>   Scanner Interval
+ -v,--verbose        verbose run info
+ -x,--coordX <X>     X coordinate (pixel offset)
+ -y,--coordY <Y>     Y coordinate (pixel offset)
 ```
 
 ## Touch
@@ -129,11 +188,49 @@ Infiltration of data (test or binary) is accomplished via producer driving a mou
 - more dependencies on instrumented image at the consumer side
 - locks up input channels
 
-#### Installation and Invocation
+#### Usage
+Roles flip. Consumer -> Remote system. Producer -> Local system.
+
+#### Producer
+
+- Java 1.7+ 
+- Build distribution via `Light/Anesthesia/producer/scripts/build.sh`
+
+- Run:
+    - Get pixel pointer coordinates: `getPointer.sh`.
+    - Run: `runRook.sh`
+```
+./runRook.sh -f /Users/dimas/Code/LST/data/B64calibrate.txt -x 72 -y 221 -a 5 -A 10 -d 47 -D 47 -w 3000
+```
 
 ```
-TBD
+usage: Rook
+ -a,--delay-aaction <DELAYA>    Delay Between Atomic Mouse Event (ms)
+ -A,--delay-caction <DELAYXA>   Delay Between Mouse Clicks (ms)
+ -d,--x-drift <XDRIFT>          X coordinate drift tolerance (pixels).
+                                Pixels between centers of tiles in image
+                                map on X
+ -D,--y-drift <YDRIFT>          Y coordinate drift tolerance (pixels).
+                                Pixels between centers of tiles in image
+                                map on Y
+ -f,--file <FILE>               Absolute path to file
+ -h,--help                      display usage
+ -v,--verbose                   verbose run info
+ -w,--window-delay <DELAYW>     Delay Target Window Focus (ms)
+ -x,--coordX <X>                X coordinate (pixel offset)
+ -y,--coordY <Y>                Y coordinate (pixel offset)
 ```
+
+#### Consumer
+Locally launched `file://` resource of 
+`Light/Anesthesia/consumer/Knight.html` in the browser
+
+Dependency: (or any custom mapped image) 
+```
+Knight.css	Knight.js	checkmate.jpg
+```
+
+
 
 ### KeyBorat
 
@@ -147,8 +244,7 @@ Infiltration of data (test or binary) is accomplished via producer posting keyst
 *Cons*
 - locks up input channels
 
-#### Installation and Invocation
-
+#### Usage
 ```
 TBD
 ```
